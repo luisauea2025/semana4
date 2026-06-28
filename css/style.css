@@ -1,0 +1,95 @@
+/* ==========================================================================
+   HOJA DE ESTILOS PERSONALIZADA - TEMÁTICA: EMPRENDIMIENTO
+   ========================================================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #fcfcfc;
+    color: #2b2b2b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.texto-justificado {
+    text-align: justify;
+}
+
+/* Fondo del banner principal con degradado enfocado a innovación */
+.hero-emprendimiento {
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.95), rgba(33, 37, 41, 0.8)), 
+                url('https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    min-height: 520px;
+}
+
+.text-shadow-manual {
+    text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Efectos visuales de botones */
+.button-efecto {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button-efecto:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3) !important;
+}
+
+/* Tarjetas con efectos dinámicos modernos */
+.card-negocio-hover {
+    border-radius: 10px !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-negocio-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Control del tamaño de imágenes en la grilla */
+.imagen-fija-grilla {
+    height: 200px;
+    object-fit: cover;
+}
+
+.img-transicion {
+    transition: transform 0.3s ease;
+}
+
+.img-transicion:hover {
+    transform: scale(1.02);
+}
+
+/* Foco personalizado en el formulario */
+.form-control:focus {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.2) !important;
+}
+
+/* ==========================================================================
+   MEDIA QUERY: Optimización Obligatoria para Pantallas Pequeñas (< 768px)
+   ========================================================================== */
+@media screen and (max-width: 767.98px) {
+    .hero-emprendimiento {
+        min-height: 380px !important;
+        text-align: center !important;
+    }
+
+    .hero-emprendimiento h1 {
+        font-size: 1.9rem !important;
+    }
+
+    .hero-emprendimiento p {
+        font-size: 1rem !important;
+    }
+
+    .py-5 {
+        padding-top: 2.5rem !important;
+        padding-bottom: 2.5rem !important;
+    }
+}
