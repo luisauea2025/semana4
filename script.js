@@ -1,185 +1,115 @@
-// ==========================================
-// 1. SELECCIÓN DE ELEMENTOS DEL DOM
-// ==========================================
-const formulario = document.getElementById('formulario-registro');
-const inputNombre = document.getElementById('nombre');
-const inputDescripcion = document.getElementById('descripcion');
-const selectCategoria = document.getElementById('categoria');
-const alerta = document.getElementById('mensaje-alerta');
-const contenedorRegistros = document.getElementById('contenedor-registros');
-const contadorTotal = document.getElementById('contador-total');
+// Base de datos simulada en memoria (Semana 7)
+let emprendimientos = [
+    { id: 1, nombre: "BioAbono Orgánico", categoria: "Agricultura" },
+    { id: 2, nombre: "App Delivery Local", categoria: "Tecnología" }
+];
 
-// Variable global para controlar el total de registros
-let totalRegistros = 0;
+// Captura de elementos del DOM
+const formulario = document.getElementById('formulario');
+const contenedorEmprendimientos = document.getElementById('contenedorEmprendimientos');
+const mensajeExito = document.getElementById('mensajeExito');
+const spinnerCarga = document.getElementById('spinnerCarga');
 
-// 2. Función para actualizar el contador en pantalla
-function actualizarContador() {
-    contadorTotal.textContent = totalRegistros;
-}
+// FUNCIÓN DE RENDERIZADO DINÁMICO (Semana 7 mejorada con clases de Bootstrap)
+function renderizarEmprendimientos() {
+    contenedorEmprendimientos.innerHTML = ''; // Limpiar la tabla antes de renderizar
 
-// ==========================================
-// NUEVO: FUNCIONES REUTILIZABLES DE VALIDACIÓN
-// ==========================================
-
-// Valida el campo Nombre (Obligatorio y longitud mínima de 3 caracteres)
-function validarNombre() {
-    const valor = inputNombre.value.trim();
-    if (valor === '') {
-        inputNombre.classList.add('is-invalid');
-        inputNombre.classList.remove('is-valid');
-        return false;
-    } else if (valor.length < 3) {
-        inputNombre.classList.add('is-invalid');
-        inputNombre.classList.remove('is-valid');
-        return false;
-    } else {
-        inputNombre.classList.add('is-valid');
-        inputNombre.classList.remove('is-invalid');
-        return true;
-    }
-}
-
-// Valida la Descripción (Obligatorio e información suficiente: mínimo 10 caracteres)
-function validarDescripcion() {
-    const valor = inputDescripcion.value.trim();
-    if (valor === '') {
-        inputDescripcion.classList.add('is-invalid');
-        inputDescripcion.classList.remove('is-valid');
-        return false;
-    } else if (valor.length < 10) {
-        inputDescripcion.classList.add('is-invalid');
-        inputDescripcion.classList.remove('is-valid');
-        return false;
-    } else {
-        inputDescripcion.classList.add('is-valid');
-        inputDescripcion.classList.remove('is-invalid');
-        return true;
-    }
-}
-
-// Valida que el usuario seleccione una categoría
-function validarCategoria() {
-    const valor = selectCategoria.value;
-    if (valor === '') {
-        selectCategoria.classList.add('is-invalid');
-        selectCategoria.classList.remove('is-valid');
-        return false;
-    } else {
-        selectCategoria.classList.add('is-valid');
-        selectCategoria.classList.remove('is-invalid');
-        return true;
-    }
-}
-
-// ==========================================
-// NUEVO: EVENTOS EN TIEMPO REAL (input y blur)
-// ==========================================
-// Validan mientras el usuario escribe ('input') o cuando sale del campo ('blur')
-inputNombre.addEventListener('input', validarNombre);
-inputNombre.addEventListener('blur', validarNombre);
-
-inputDescripcion.addEventListener('input', validarDescripcion);
-inputDescripcion.addEventListener('blur', validarDescripcion);
-
-selectCategoria.addEventListener('change', validarCategoria);
-selectCategoria.addEventListener('blur', validarCategoria);
-
-
-// ==========================================
-// 3. CAPTURA DEL EVENTO 'SUBMIT'
-// ==========================================
-formulario.addEventListener('submit', function (event) {
-    // Evita que la página se recargue por defecto
-    event.preventDefault();
-
-    // Ejecutamos las validaciones obligatorias antes de registrar
-    const nombreValido = validarNombre();
-    const descripcionValida = validarDescripcion();
-    const categoriaValida = validarCategoria();
-
-    // Permite registrar información ÚNICAMENTE si todas las validaciones son correctas (true)
-    if (nombreValido && descripcionValida && categoriaValida) {
+    emprendimientos.forEach(emp => {
+        const fila = document.createElement('tr');
         
-        // Si todo está bien, ocultamos y limpiamos cualquier alerta de error previa
-        alerta.classList.add('d-none');
-        alerta.classList.remove('alert-danger');
+        fila.innerHTML = `
+            <td class="fw-bold">#${emp.id}</td>
+            <td>${emp.nombre}</td>
+            <td><span class="badge bg-secondary p-2">${emp.categoria}</span></td>
+            <td class="text-center">
+                <!-- Botón Info de Bootstrap que activa la función del Modal -->
+                <button class="btn btn-info btn-sm text-white me-1 fw-semibold" onclick="verDetalles(${emp.id})">
+                    Ver Detalles
+                </button>
+                <!-- Botón Danger de Bootstrap para eliminar -->
+                <button class="btn btn-danger btn-sm fw-semibold" onclick="eliminarEmprendimiento(${emp.id})">
+                    Eliminar
+                </button>
+            </td>
+        `;
+        contenedorEmprendimientos.appendChild(fila);
+    });
+}
 
-        // Obtener los valores limpios
-        const nombre = inputNombre.value.trim();
-        const descripcion = inputDescripcion.value.trim();
-        const categoria = selectCategoria.value;
+// MANEJADOR DEL EVENTO SUBMIT (Semana 6 mejorado con Spinner y Alertas)
+formulario.addEventListener('submit', function (event) {
+    event.preventDefault(); // Evitar recarga de página
 
-        // 5. Creación de elementos HTML dinámicos usando createElement (Tu código original)
-        const columnaCard = document.createElement('div');
-        columnaCard.className = 'col-12 mb-3'; // Añadido un pequeño margen abajo
+    // Captura de valores de los inputs
+    const idInput = document.getElementById('idEmprendimiento').value;
+    const nombreInput = document.getElementById('nombre').value;
+    const categoriaInput = document.getElementById('categoria').value;
 
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'card h-100 border-start border-primary border-4 shadow-sm';
+    // VALIDACIÓN DINÁMICA (Semana 6): Evitar IDs duplicados
+    const existeId = emprendimientos.some(e => e.id == idInput);
+    if (existeId) {
+        alert("Error: El ID ingresado ya pertenece a un emprendimiento registrado.");
+        return;
+    }
 
-        const cuerpoTarjeta = document.createElement('div');
-        cuerpoTarjeta.className = 'card-body d-flex justify-content-between align-items-start';
+    // ACTIVACIÓN DEL SPINNER (Quita la clase oculta de Bootstrap 'd-none')
+    spinnerCarga.classList.remove('d-none');
 
-        const infoContenedor = document.createElement('div');
-
-        const titulo = document.createElement('h5');
-        titulo.className = 'card-title mb-1 fw-bold';
-        titulo.textContent = nombre;
-
-        const insignia = document.createElement('span');
-        insignia.className = 'badge bg-info text-dark mb-2';
-        insignia.textContent = categoria;
-
-        const textoDescripcion = document.createElement('p');
-        textoDescripcion.className = 'card-text text-muted small mb-0';
-        textoDescripcion.textContent = descripcion;
-
-        // Botón para eliminar el registro individual
-        const botonEliminar = document.createElement('button');
-        botonEliminar.className = 'btn btn-outline-danger btn-sm';
-        botonEliminar.innerHTML = 'Eliminar'; 
-
-        // 6. Manejo del evento click en el botón Eliminar
-        botonEliminar.addEventListener('click', function () {
-            columnaCard.remove(); 
-            totalRegistros--;     
-            actualizarContador(); 
+    // Simulación de proceso de carga en red (Asíncrono simulado)
+    setTimeout(() => {
+        // Añadir nuevo registro al arreglo
+        emprendimientos.push({
+            id: parseInt(idInput),
+            nombre: nombreInput,
+            categoria: categoriaInput
         });
 
-        // 7. Estructurar los elementos mediante appendChild
-        infoContenedor.appendChild(titulo);
-        infoContenedor.appendChild(insignia);
-        infoContenedor.appendChild(textoDescripcion);
+        // Actualizar la interfaz visual
+        renderizarEmprendimientos();
+        formulario.reset(); // Limpiar el formulario
 
-        cuerpoTarjeta.appendChild(infoContenedor);
-        cuerpoTarjeta.appendChild(botonEliminar);
+        // APAGAR EL SPINNER
+        spinnerCarga.classList.add('d-none');
 
-        tarjeta.appendChild(cuerpoTarjeta);
-        columnaCard.appendChild(tarjeta);
+        // MOSTRAR ALERTA DE ÉXITO BOOTSTRAP
+        mensajeExito.classList.remove('d-none');
 
-        // Insertar la tarjeta completa en el contenedor principal del HTML
-        contenedorRegistros.appendChild(columnaCard);
+        // Temporizador de 3 segundos exactos para ocultar la alerta (Como se observa en tu captura)
+        setTimeout(() => {
+            mensajeExito.classList.add('d-none');
+        }, 3000);
 
-        // 8. Incrementar y actualizar el contador global
-        totalRegistros++;
-        actualizarContador();
-
-        // MOSTRAR MENSAJE DINÁMICO DE ÉXITO CON CLASES BOOTSTRAP
-        alerta.textContent = '¡Registro completado con éxito!';
-        alerta.className = 'alert alert-success mt-3'; // Aplica el color verde
-        alerta.classList.remove('d-none');
-
-        // 9. Limpiar el formulario para un nuevo registro
-        formulario.reset();
-
-        // Quitar los bordes verdes para que el formulario quede limpio para el siguiente uso
-        inputNombre.classList.remove('is-valid');
-        inputDescripcion.classList.remove('is-valid');
-        selectCategoria.classList.remove('is-valid');
-
-    } else {
-        // MOSTRAR MENSAJE DINÁMICO DE ERROR CON CLASES BOOTSTRAP
-        alerta.textContent = 'Por favor, completa todos los campos correctamente con la información solicitada.';
-        alerta.className = 'alert alert-danger mt-3'; // Aplica el color rojo
-        alerta.classList.remove('d-none');
-    }
+    }, 1200); // 1.2 segundos de retraso para apreciar la animación del Spinner
 });
+
+// FUNCIÓN DINÁMICA PARA ELIMINAR REGISTROS (Mantenida exactamente como tu captura)
+function eliminarEmprendimiento(id) {
+    // Filtrar el arreglo excluyendo el ID seleccionado
+    emprendimientos = emprendimientos.filter(e => e.id !== id);
+    // Volver a dibujar la tabla
+    renderizarEmprendimientos();
+}
+
+// FUNCIÓN PARA RECOLECTAR DATOS Y DESPLEGAR EL MODAL BOOTSTRAP
+function verDetalles(id) {
+    const emp = emprendimientos.find(e => e.id === id);
+    if (emp) {
+        // Estructura limpia usando texto formateado dentro del modal
+        document.getElementById('modalContenido').innerHTML = `
+            <div class="p-2">
+                <p><strong>Identificador Numérico:</strong> #${emp.id}</p>
+                <p><strong>Nombre Comercial:</strong> ${emp.nombre}</p>
+                <p><strong>Sector de Mercado:</strong> ${emp.categoria}</p>
+                <hr>
+                <p class="text-muted small mb-0">💡 Registro guardado en el almacenamiento temporal de la sesión del navegador de manera exitosa.</p>
+            </div>
+        `;
+
+        // Instanciar y disparar la ventana modal nativa de Bootstrap
+        const miModal = new bootstrap.Modal(document.getElementById('detalleModal'));
+        miModal.show();
+    }
+}
+
+// RENDERIZADO INICIAL AL CARGAR COMPLETAMENTE EL DOM (Mantenida exactamente como tu captura)
+document.addEventListener('DOMContentLoaded', renderizarEmprendimientos);
