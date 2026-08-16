@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Sistema Integrado{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-primary">Ecosistema Emprendedor</h1>
+        <p class="col-md-9 fs-5 text-muted mt-3">
+            Bienvenido al sistema de administración centralizado. Utilice la barra superior para navegar entre los catálogos de productos, clientes, registros de proveedores y módulos de facturación.
+        </p>
+        <hr class="my-4">
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('productos') }}" class="btn btn-primary btn-lg">Gestionar Productos</a>
+            <a href="{{ url_for('facturacion') }}" class="btn btn-outline-secondary btn-lg">Facturación</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

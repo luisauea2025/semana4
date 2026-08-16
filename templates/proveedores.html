@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Proveedores - Sistema Integrado{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Directorio de Proveedores</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Razón Social</th>
+                        <th>Persona de Contacto</th>
+                        <th>Teléfono</th>
+                        <th>Ubicación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prov in proveedores %}
+                    <tr>
+                        <td>{{ prov.id }}</td>
+                        <td class="fw-bold">{{ prov.empresa }}</td>
+                        <td>{{ prov.contacto }}</td>
+                        <td>{{ prov.telefono }}</td>
+                        <td>{{ prov.ciudad }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
