@@ -1,50 +1,71 @@
+import os
+import sqlite3
 from flask import Flask, render_template, redirect, url_for, flash
 from forms.producto_form import ProductoForm
-from forms.cliente_form import ClienteForm
-from forms.proveedor_form import ProveedorForm
-from forms.factura_form import FacturaForm
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mi_clave_secreta_super_segura_123'
+app.config['SECRET_KEY'] = 'mi_clave_secreta'
 
-lista_productos = [{"id": 101, "nombre": "Laptop Pro", "precio": 1200.00, "stock": 5}]
-lista_clientes = []
-lista_proveedores = []
-lista_facturas = []
+# Ruta hacia la carpeta data/ y el archivo de base de datos
+DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'ferreteria.db')
+
+def init_db():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS productos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            precio REAL NOT NULL,
+            stock INTEGER NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Inicializamos la base de datos
+init_db()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/productos')
+@app.route('/productos', methods=['GET', 'POST'])
 def productos():
-    return render_template('productos.html', productos=lista_productos)
-
-@app.route('/productos/nuevo', methods=['GET', 'POST'])
-def nuevo_producto():
     form = ProductoForm()
+
     if form.validate_on_submit():
-        nuevo_item = {
-            "id": len(lista_productos) + 101,
-            "nombre": form.nombre.data,
-            "precio": float(form.precio.data),
-            "stock": form.stock.data
-        }
-        lista_productos.append(nuevo_item)
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        # Se convierte form.precio.data a float() para evitar el error de sqlite3
+        cursor.execute(
+            'INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)',
+            (form.nombre.data, float(form.precio.data), form.stock.data)
+        )
+        conn.commit()
+        conn.close()
         return redirect(url_for('productos'))
-    return render_template('producto_form.html', form=form)
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, nombre, precio, stock FROM productos')
+    lista_productos = cursor.fetchall()
+    conn.close()
+
+    return render_template('productos.html', form=form, productos=lista_productos)
 
 @app.route('/clientes')
 def clientes():
-    return render_template('clientes.html', clientes=lista_clientes)
+    return render_template('clientes.html')
 
 @app.route('/proveedores')
 def proveedores():
-    return render_template('proveedores.html', proveedores=lista_proveedores)
+    return render_template('proveedores.html')
 
 @app.route('/facturacion')
 def facturacion():
-    return render_template('facturacion.html', facturas=lista_facturas)
+    return render_template('facturacion.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
