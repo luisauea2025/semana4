@@ -15,5 +15,4 @@ CREATE TABLE IF NOT EXISTS productos (
     FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
 );
 
--- Insertar categorías por defecto
-INSERT INTO categorias (nombre) VALUES ('Herramientas Manuales'), ('Materiales de Construcción');
+INSERT INTO categorias (nombre) VALUES ('Herramientas'), ('Materiales');
