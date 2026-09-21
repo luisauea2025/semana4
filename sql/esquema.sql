@@ -1,19 +1,5 @@
-CREATE DATABASE IF NOT EXISTS ferreteria_db;
-USE ferreteria_db;
-
-CREATE TABLE IF NOT EXISTS categorias (
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL
+    usuario VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS productos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    precio DECIMAL(10,2) NOT NULL,
-    stock INT NOT NULL,
-    categoria_id INT,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
-);
-
--- Datos iniciales de prueba
-INSERT INTO categorias (nombre) VALUES ('Herramientas'), ('Materiales');
