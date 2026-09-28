@@ -1,16 +1,15 @@
-import mysql.connector
-from mysql.connector import Error
+import os
+import psycopg2
 
 def obtener_conexion():
     try:
-        conexion = mysql.connector.connect(
-            host='localhost',
-            user='root',         # Tu usuario de MySQL
-            password='tu_password', # Tu contraseña de MySQL
-            database='ferreteria_db'
-        )
-        if conexion.is_connected():
-            return conexion
-    except Error as e:
-        print(f"Error al conectar con MySQL: {e}")
+        # Lee la variable DATABASE_URL de Render
+        database_url = os.environ.get('DATABASE_URL')
+        if not database_url:
+            raise ValueError("No se encontró la variable DATABASE_URL")
+        
+        conexion = psycopg2.connect(database_url)
+        return conexion
+    except Exception as e:
+        print(f"Error al conectar con PostgreSQL: {e}")
         return None
